@@ -10,12 +10,12 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 # Add a new customer to the database
-new_customer = Customer(first_name="John", last_name="Doe")
+new_customer = Customer(first_name="Victor", last_name="Nja")
 session.add(new_customer)
 session.commit()
 
 # Add a new restaurant to the database
-new_restaurant = Restaurant(name="Sample Restaurant", price=3)
+new_restaurant = Restaurant(name="Burger King", price=3)
 session.add(new_restaurant)
 session.commit()
 
@@ -39,3 +39,22 @@ if customer and restaurant:
     print(f"All Reviews for {restaurant.name}: {restaurant.all_reviews()}")
 else:
     print("No customer or restaurant found in the database.")
+
+customer = session.query(Customer).first()
+restaurant = session.query(Restaurant).first()
+
+# Print initial reviews for the customer
+print("Initial reviews for the customer:")
+for review in customer.reviews:
+    print(review.full_review())
+
+# Delete all reviews for the given restaurant
+customer.delete_reviews(session, restaurant)
+
+# Print remaining reviews for the customer (after deletion)
+print("Remaining reviews for the customer:")
+for review in customer.reviews:
+    print(review.full_review())
+
+session.commit()
+session.close()
