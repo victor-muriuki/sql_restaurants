@@ -12,12 +12,26 @@ class Restaurant(Base):
     price = Column(Integer)
     reviews = relationship('Review', back_populates='restaurant')
 
+    @classmethod
+    def fanciest(cls):
+        return max(cls.query.all(), key=lambda restaurant: restaurant.price)
+
+    def all_reviews(self):
+        return [review.full_review() for review in self.reviews]
+
 class Customer(Base):
     __tablename__ = 'customers'
     id = Column(Integer, primary_key=True)
     first_name = Column(String)
     last_name = Column(String)
     reviews = relationship('Review', back_populates='customer')
+
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+    def restaurants(self):
+        return [review.restaurant for review in self.reviews]
+
+# models.py
 
 class Review(Base):
     __tablename__ = 'reviews'
@@ -28,5 +42,9 @@ class Review(Base):
     customer = relationship('Customer', back_populates='reviews')
     restaurant = relationship('Restaurant', back_populates='reviews')
 
-engine = create_engine('sqlite:///your_database.db')
+    def full_review(self):
+        return f"Review for {self.restaurant.name} by {self.customer.full_name()}: {self.star_rating} stars."
+
+
+engine = create_engine('sqlite:///reviews.db') 
 Base.metadata.create_all(engine)
